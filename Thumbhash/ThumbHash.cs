@@ -10,7 +10,7 @@ public static class ThumbHash
      * @param rgba The pixels in the input image, row-by-row. Must have w*h*4 elements.
      * @return The ThumbHash as a byte array.
      */
-    public static byte[] rgbaToThumbHash(int w, int h, byte[] rgba)
+    public static byte[] RgbaToThumbHash(int w, int h, byte[] rgba)
     {
         // Encoding an image larger than 100x100 is slow with no benefit
         if (w > 100 || h > 100) throw new ArgumentException(w + "x" + h + " doesn't fit in 100x100");
@@ -119,10 +119,10 @@ public static class ThumbHash
         // Read the varying factors (boost saturation by 1.25x to compensate for quantization)
         int ac_start = hasAlpha ? 6 : 5;
         int ac_index = 0;
-        Channel l_channel = new Channel(lx, ly);
-        Channel p_channel = new Channel(3, 3);
-        Channel q_channel = new Channel(3, 3);
-        Channel a_channel = null;
+        Channel l_channel = new(lx, ly);
+        Channel p_channel = new(3, 3);
+        Channel q_channel = new(3, 3);
+        Channel? a_channel = null;
         ac_index = l_channel.decode(hash, ac_start, ac_index, l_scale);
         ac_index = p_channel.decode(hash, ac_start, ac_index, p_scale * 1.25f);
         ac_index = q_channel.decode(hash, ac_start, ac_index, q_scale * 1.25f);
@@ -179,12 +179,14 @@ public static class ThumbHash
 
                 // Decode A
                 if (hasAlpha)
+                {
                     for (int cy = 0, j = 0; cy < 5; cy++)
                     {
                         float fy2 = fy[cy] * 2.0f;
                         for (int cx = cy > 0 ? 0 : 1; cx < 5 - cy; cx++, j++)
                             a += a_ac[j] * fx[cx] * fy2;
                     }
+                }
 
                 // Convert to RGB
                 float b = l - 2.0f / 3.0f * p;

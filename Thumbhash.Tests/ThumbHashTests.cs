@@ -1,16 +1,26 @@
+using System.Drawing;
+
+using SkiaSharp;
+
 namespace Thumbhash.Tests;
 
 public class ThumbHashTests
 {
-    [Fact]
-    public void Method_WithPositiveValue_AddsOne()
+    [Theory]
+    [InlineData("firefox.png", "X5qGNQw7oElslqhGWfSE+Q6oJ1h2iHB2Rw==")]
+    [InlineData("sunrise.jpg", "1QcSHQRnh493V4dIh4eXh1h4kJUI")]
+    [InlineData("flower.jpg", "k0oGLQaSVsN0BVhn2oq2Z5SQUQcZ")]
+    public void RgbaToThumbHash_WithImage_ReturnsHash(string fileName, string expectedHash)
     {
         //Arrange
-        AutoMocker mocker = new();
+        using SKBitmap bitmap = SKBitmap.Decode($"Images/{fileName}");
+        using SKBitmap rgb = bitmap.Copy(SKColorType.Rgba8888);
 
         //Act
-
+        byte[] hash = ThumbHash.RgbaToThumbHash(rgb.Width, rgb.Height, rgb.Bytes);
+        
         //Assert
-        //Assert.Equal(42, result);
+        string base64Hash = Convert.ToBase64String(hash);
+        Assert.Equal(expectedHash, base64Hash);
     }
 }
